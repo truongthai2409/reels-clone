@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+/* Custom scroll-snap styles for video slider */
+.scroll-snap-y {
+  scroll-snap-type: y mandatory;
+}
+
+.scroll-snap-mandatory {
+  scroll-snap-stop: always;
+}
+
+.scroll-smooth {
+  scroll-behavior: smooth ease-in-out 0.3s;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
