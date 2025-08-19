@@ -6,6 +6,8 @@ import {
 import SignIn from "./component/page/sign-in/sign-in";
 import Home from "./component/page/home/home";
 import useAuthStore from "./store/authStore";
+import ProfileForm from "./component/page/form/form";
+// import { ThemeProvider } from "./context/theme";
 // import { AuthProvider } from "./store/authProvider";
 
 function App() {
@@ -16,15 +18,20 @@ function App() {
       element: <SignIn />,
     },
     {
+      path: "/form",
+      element: <ProfileForm />,
+    },
+    {
       path: "/",
       element: isAuthenticated ? <Home /> : <Navigate to="/auth" />,
     },
+
   ]);
   return (
     <>
-      {/* <AuthProvider> */}
+      {/* <ThemeProvider> */}
         <RouterProvider router={router} />
-      {/* </AuthProvider> */}
+      {/* </ThemeProvider> */}
     </>
   );
 }
