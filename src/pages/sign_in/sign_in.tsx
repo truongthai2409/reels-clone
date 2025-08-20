@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import useAuthStore from "../../../store/authStore";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "@/stores/authStore"; 
 
 // Định nghĩa type cho form
 interface SignInForm {

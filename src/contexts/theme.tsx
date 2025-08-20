@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { THEME_STORAGE_KEY } from "../config";
+import { THEME_STORAGE_KEY } from "@/configs";
 
 type ThemeContextValue = {
   dark: boolean;

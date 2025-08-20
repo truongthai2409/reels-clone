@@ -3,16 +3,22 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import SignIn from "./component/page/sign-in/sign-in";
-import Home from "./component/page/home/home";
-import useAuthStore from "./store/authStore";
-import ProfileForm from "./component/page/form/form";
-// import { ThemeProvider } from "./context/theme";
-// import { AuthProvider } from "./store/authProvider";
+
+import useAuthStore from "@/stores/authStore";
+import SignIn from "@/pages/sign_in/sign_in";
+import ProfileForm from "@/pages/form/form";
+import DragDropList from "@/pages/dragdrop/dnd";
+import Home from "@/pages/home/home";
+
+
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const router = createBrowserRouter([
+     {
+      path: "/",
+      element: isAuthenticated ? <Home /> : <Navigate to="/auth" />,
+    },
     {
       path: "/auth",
       element: <SignIn />,
@@ -22,9 +28,10 @@ function App() {
       element: <ProfileForm />,
     },
     {
-      path: "/",
-      element: isAuthenticated ? <Home /> : <Navigate to="/auth" />,
+      path: "/dragdrop",
+      element: <DragDropList />,
     },
+   
 
   ]);
   return (

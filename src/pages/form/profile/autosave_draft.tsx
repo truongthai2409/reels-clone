@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import type { ProfileFormValues } from "../../types/form.types";
-import { STORAGE_KEY } from "../../config";
+import type { ProfileFormValues } from "@/types/form.types";
+import { STORAGE_KEY } from "@/configs";
 
 export function AutosaveDraft({
   values,

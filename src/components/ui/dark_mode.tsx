@@ -1,4 +1,4 @@
-import { useTheme } from "../../context/theme";
+import { useTheme } from "@/contexts/theme";
 
 export function DarkModeToggle() {
     const { dark, toggle } = useTheme();

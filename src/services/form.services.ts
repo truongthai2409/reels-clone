@@ -1,6 +1,6 @@
-import { ProfileSchema } from "../component/page/form/validate";
-import { STORAGE_KEY, todayISO } from "../config";
-import type { ProfileFormValues } from "../types/form.types";
+import { STORAGE_KEY, todayISO } from "@/configs";
+import { ProfileSchema } from "@/pages/form/validate";
+import type { ProfileFormValues } from "@/types/form.types";
 
 const DEFAULT_VALUES: ProfileFormValues = {
   name: "",
@@ -13,6 +13,7 @@ const DEFAULT_VALUES: ProfileFormValues = {
   acceptTerms: false,
   experiences: [
     {
+      id: Date.now().toString(), // Add id for drag & drop
       company: "",
       role: "",
       startDate: todayISO(),
@@ -45,3 +46,27 @@ export function calcAge(dateStr: string) {
   if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
   return age;
 }
+
+export const handleProfileSubmit = async (
+  values: any,
+  { setSubmitting, setBanner }: any
+) => {
+  setBanner(null);
+  setSubmitting(true);
+
+  try {
+    await new Promise((r) => setTimeout(r, 1200)); // Fake API
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+    setBanner({
+      type: "success",
+      msg: "Profile saved successfully!",
+    });
+  } catch {
+    setBanner({
+      type: "error",
+      msg: "Failed to submit. Please try again.",
+    });
+  } finally {
+    setSubmitting(false);
+  }
+};

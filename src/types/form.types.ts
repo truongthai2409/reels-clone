@@ -1,4 +1,4 @@
 import type z from "zod";
-import { ProfileSchema } from "../component/page/form/validate";
+import type { ProfileSchema } from "@/pages/form/validate";
 
 export type ProfileFormValues = z.infer<typeof ProfileSchema>;

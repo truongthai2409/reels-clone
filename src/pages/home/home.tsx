@@ -12,7 +12,7 @@ import {
   Volume2,
   Pause,
 } from "lucide-react";
-import Sidebar from "../../ui/sidebar";
+import Sidebar from "@/components/ui/sidebar";
 
 const shortsData = [
   {

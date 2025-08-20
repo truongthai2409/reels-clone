@@ -1,14 +1,15 @@
 import z from "zod";
-import { calcAge } from "../../../services/form.services";
+import { calcAge } from "@/services/form.services"; 
 
 const HighlightSchema = z
   .string()
   .trim()
-  .min(1, "Highlight is required")
+  .min(0, "Highlight is required")
   .max(80, "Max 80 characters");
 
 const ExperienceSchema = z
   .object({
+    id: z.string(), // Required id for drag & drop
     company: z.string().trim().min(2, "Min 2 chars").max(100, "Max 100 chars"),
     role: z.string().trim().min(2, "Min 2 chars").max(100, "Max 100 chars"),
     startDate: z.string().min(1, "Required"),
