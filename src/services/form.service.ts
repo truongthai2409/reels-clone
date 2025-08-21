@@ -1,5 +1,5 @@
 import { STORAGE_KEY, todayISO } from "@/configs";
-import { ProfileSchema } from "@/pages/form/validate";
+import { ProfileSchema } from "@/helpers/validations/form.schema";
 import type { ProfileFormValues } from "@/types/form.types";
 
 const DEFAULT_VALUES: ProfileFormValues = {

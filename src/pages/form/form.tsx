@@ -1,15 +1,13 @@
 import { useRef, useState } from "react";
 import { Formik, Form } from "formik";
-import { handleProfileSubmit, loadDraft } from "@/services/form.services";
-import { ProfileSchema } from "@/pages/form/validate";
+import { handleProfileSubmit, loadDraft } from "@/services/form.service";
 import type { ProfileFormValues } from "@/types/form.types";
 import { ThemeProvider } from "@/contexts/theme";
 import { DarkModeToggle } from "@/components/ui";
 import { SubmitButton } from "@/components/form";
 import { ExperiencesSection } from "./experience/experience_section";
-import { AutosaveDraft } from "./profile/autosave_draft";
-import { BasicInfoSection } from "./profile/profile_section";
-import { FormDebug } from "./profile/debug";
+import { ProfileSchema } from "@/helpers/validations/form.schema";
+import { BasicInfoSection, FormDebug, AutosaveDraft } from "./profile";
 
 interface BannerType {
   type: "success" | "error";
