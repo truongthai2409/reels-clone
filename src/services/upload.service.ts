@@ -1,3 +1,4 @@
+import axios, { type AxiosProgressEvent } from "axios";
 import type { UploadResult } from "@/types/upload.types";
 import { UPLOAD_IMAGE_MUTATION_STRING } from "./apollo.service";
 
@@ -61,59 +62,51 @@ function buildFormData(file: File, query: string): FormData {
 }
 
 /** Parse response từ server */
-function parseGraphQLResponse(
-  xhr: XMLHttpRequest,
-  resolve: Function,
-  reject: Function
-) {
-  try {
-    const result = JSON.parse(xhr.responseText);
-
-    if (result.errors) {
-      reject(new Error(result.errors[0]?.message || "GraphQL error occurred"));
-    } else {
-      resolve(result.data.uploadImage);
-    }
-  } catch {
-    reject(new Error("Failed to parse response"));
+function parseGraphQLResponse(response: any): UploadResult {
+  if (response.data.errors) {
+    throw new Error(response.data.errors[0]?.message || "GraphQL error occurred");
   }
+  return response.data.data.uploadImage;
 }
 
-/** Upload file với progress callback */
-export function uploadFileWithProgress(
+/** Upload file với progress callback sử dụng Axios */
+export async function uploadFileWithProgress(
   file: File,
   onProgress?: (progress: number) => void
 ): Promise<UploadResult> {
-  return new Promise((resolve, reject) => {
+  try {
     const formData = buildFormData(file, UPLOAD_IMAGE_MUTATION_STRING);
-    const xhr = new XMLHttpRequest();
 
-    // Theo dõi progress
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable && onProgress) {
-        const percent = Math.round((event.loaded / event.total) * 100);
-        onProgress(percent);
-      }
-    };
+    const response = await axios.post(GRAPHQL_ENDPOINT, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Apollo-Require-Preflight": "true",
+        "X-Apollo-Operation-Name": "UploadFile",
+      },
+      onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+        if (progressEvent.total && onProgress) {
+          const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+          onProgress(percent);
+        }
+      },
+    });
 
-    // Thành công
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        parseGraphQLResponse(xhr, resolve, reject);
+    return parseGraphQLResponse(response);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        // Server responded with error status
+        throw new Error(`HTTP error! status: ${error.response.status}`);
+      } else if (error.request) {
+        // Network error
+        throw new Error("Network error occurred");
       } else {
-        reject(new Error(`HTTP error! status: ${xhr.status}`));
+        // Request setup error
+        throw new Error("Request setup error");
       }
-    };
-
-    // Lỗi network / abort
-    xhr.onerror = () => reject(new Error("Network error occurred"));
-    xhr.onabort = () => reject(new Error("Upload aborted"));
-
-    xhr.open("POST", GRAPHQL_ENDPOINT);
-
-    xhr.setRequestHeader("Apollo-Require-Preflight", "true");
-    xhr.setRequestHeader("X-Apollo-Operation-Name", "UploadFile");
-
-    xhr.send(formData);
-  });
+    }
+    
+    // Re-throw other errors
+    throw error;
+  }
 }
