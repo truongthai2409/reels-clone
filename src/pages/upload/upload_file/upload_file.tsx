@@ -1,5 +1,5 @@
 import React from 'react';
-import { Formik, Form } from "formik";
+import { Formik, Form } from 'formik';
 import { InputField } from '@/components/upload';
 import { UploadField } from '@/components/upload/upload_field';
 import { validationDemoSchema } from '@/helpers/validations/upload.schema';
@@ -25,34 +25,36 @@ interface FormValues {
 
 export const UploadFile: React.FC = () => {
   const initialValues: FormValues = {
-    email: "",
-    phone: "",
-    website: "",
-    age: "",
-    birthDate: "",
+    email: '',
+    phone: '',
+    website: '',
+    age: '',
+    birthDate: '',
     hobbies: [],
     address: {
-      street: "",
-      city: "",
-      zipCode: "",
-      country: ""
+      street: '',
+      city: '',
+      zipCode: '',
+      country: '',
     },
     hasCompany: false,
-    companyName: "",
-    username: "",
-    documents: null
+    companyName: '',
+    username: '',
+    documents: null,
   };
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-8">Yup Validation Demo</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">
+        Yup Validation Demo
+      </h1>
 
       <Formik<FormValues>
         initialValues={initialValues}
         validationSchema={validationDemoSchema}
-        onSubmit={(values) => {
-          console.log("Form submitted:", values);
-          alert("Form submitted successfully! Check console for details.");
+        onSubmit={values => {
+          console.log('Form submitted:', values);
+          alert('Form submitted successfully! Check console for details.');
         }}
       >
         {({ values, errors, touched, handleChange, setFieldValue }) => (
@@ -71,29 +73,41 @@ export const UploadFile: React.FC = () => {
                 <InputField name="username" label="Username" type="text" />
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium mb-2">Hobbies</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Hobbies
+                  </label>
                   <div className="space-y-2">
-                    {['Reading', 'Gaming', 'Sports', 'Music', 'Travel'].map(hobby => (
-                      <label key={hobby} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          value={hobby}
-                          checked={values.hobbies.includes(hobby)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setFieldValue('hobbies', [...values.hobbies, hobby]);
-                            } else {
-                              setFieldValue('hobbies', values.hobbies.filter(h => h !== hobby));
-                            }
-                          }}
-                          className="rounded border-gray-300"
-                        />
-                        <span className="text-sm">{hobby}</span>
-                      </label>
-                    ))}
+                    {['Reading', 'Gaming', 'Sports', 'Music', 'Travel'].map(
+                      hobby => (
+                        <label key={hobby} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            value={hobby}
+                            checked={values.hobbies.includes(hobby)}
+                            onChange={e => {
+                              if (e.target.checked) {
+                                setFieldValue('hobbies', [
+                                  ...values.hobbies,
+                                  hobby,
+                                ]);
+                              } else {
+                                setFieldValue(
+                                  'hobbies',
+                                  values.hobbies.filter(h => h !== hobby)
+                                );
+                              }
+                            }}
+                            className="rounded border-gray-300"
+                          />
+                          <span className="text-sm">{hobby}</span>
+                        </label>
+                      )
+                    )}
                   </div>
                   {touched.hobbies && errors.hobbies && (
-                    <div className="text-red-500 text-sm mt-1">{errors.hobbies}</div>
+                    <div className="text-red-500 text-sm mt-1">
+                      {errors.hobbies}
+                    </div>
                   )}
                 </div>
 
@@ -111,7 +125,11 @@ export const UploadFile: React.FC = () => {
                 </div>
 
                 {values.hasCompany && (
-                  <InputField name="companyName" label="Company Name" type="text" />
+                  <InputField
+                    name="companyName"
+                    label="Company Name"
+                    type="text"
+                  />
                 )}
               </div>
             </div>
@@ -121,8 +139,16 @@ export const UploadFile: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InputField name="address.street" label="Street" type="text" />
                 <InputField name="address.city" label="City" type="text" />
-                <InputField name="address.zipCode" label="ZIP Code" type="text" />
-                <InputField name="address.country" label="Country" type="text" />
+                <InputField
+                  name="address.zipCode"
+                  label="ZIP Code"
+                  type="text"
+                />
+                <InputField
+                  name="address.country"
+                  label="Country"
+                  type="text"
+                />
               </div>
             </div>
 
@@ -143,7 +169,9 @@ export const UploadFile: React.FC = () => {
 
             {/* Debug */}
             <details className="mt-6">
-              <summary className="cursor-pointer text-sm text-gray-600">Debug Info</summary>
+              <summary className="cursor-pointer text-sm text-gray-600">
+                Debug Info
+              </summary>
               <pre className="mt-2 p-4 bg-gray-100 rounded text-xs overflow-auto">
                 {JSON.stringify({ values, errors, touched }, null, 2)}
               </pre>

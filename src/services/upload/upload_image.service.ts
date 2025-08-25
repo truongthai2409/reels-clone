@@ -1,9 +1,9 @@
-import { type AxiosProgressEvent } from "axios";
-import type { UploadResult } from "@/types/upload.types";
-import { GRAPHQL_ENDPOINT } from "@/configs";
-import { uploadInstance } from "@/configs";
-import { UPLOAD_IMAGE_MUTATION } from "@/graphql/mutations/upload_file";
-import { buildFormData } from "./upload.service";
+import { type AxiosProgressEvent } from 'axios';
+import type { UploadResult } from '@/types/upload.types';
+import { GRAPHQL_ENDPOINT } from '@/configs';
+import { uploadInstance } from '@/configs';
+import { UPLOAD_IMAGE_MUTATION } from '@/graphql/mutations/upload_file';
+import { buildFormData } from './upload.service';
 
 // function parseGraphQLResponse(response: any): UploadResult {
 //   if (response.data.errors) {

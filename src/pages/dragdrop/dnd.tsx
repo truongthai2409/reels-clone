@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -6,15 +6,15 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
   useSortable,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const SortableItem = ({ id }: { id: string }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -23,12 +23,12 @@ const SortableItem = ({ id }: { id: string }) => {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    padding: "12px",
-    marginBottom: "8px",
-    borderRadius: "8px",
-    background: "#f1f5f9",
-    border: "1px solid #cbd5e1",
-    cursor: "grab",
+    padding: '12px',
+    marginBottom: '8px',
+    borderRadius: '8px',
+    background: '#f1f5f9',
+    border: '1px solid #cbd5e1',
+    cursor: 'grab',
   };
 
   return (
@@ -39,7 +39,7 @@ const SortableItem = ({ id }: { id: string }) => {
 };
 
 const DragDropList = () => {
-  const [items, setItems] = useState(["Task A", "Task B", "Task C", "Task D"]);
+  const [items, setItems] = useState(['Task A', 'Task B', 'Task C', 'Task D']);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -50,10 +50,10 @@ const DragDropList = () => {
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragEnd={(event) => {
+      onDragEnd={event => {
         const { active, over } = event;
         if (over && active.id !== over.id) {
-          setItems((prev) => {
+          setItems(prev => {
             const oldIndex = prev.indexOf(active.id as string);
             const newIndex = prev.indexOf(over.id as string);
             return arrayMove(prev, oldIndex, newIndex);
@@ -62,7 +62,7 @@ const DragDropList = () => {
       }}
     >
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
-        {items.map((id) => (
+        {items.map(id => (
           <SortableItem key={id} id={id} />
         ))}
       </SortableContext>

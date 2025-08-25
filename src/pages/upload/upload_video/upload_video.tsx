@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Formik, Form, Field } from "formik";
-import type { UploadImageValues } from "@/types/form.types";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Formik, Form, Field } from 'formik';
+import type { UploadImageValues } from '@/types/form.types';
 import {
   uploadVideoWithProgress,
   uploadVideoInChunks,
   getVideoInfo,
-} from "@/services/upload/upload_video.service";
-import { ProgressBar } from "@/components/upload";
-import { useBanner } from "@/hooks/useBanner";
-import { SubmitButton } from "@/components/upload/submit_button";
-import { SUPPORTED_VIDEO_TYPES } from "@/constraints";
-import { validateVideoFile } from "@/helpers/validations";
+} from '@/services/upload/upload_video.service';
+import { ProgressBar } from '@/components/upload';
+import { useBanner } from '@/hooks/useBanner';
+import { SubmitButton } from '@/components/upload/submit_button';
+import { SUPPORTED_VIDEO_TYPES } from '@/constraints';
+import { validateVideoFile } from '@/helpers/validations';
 
 const initialValues: UploadImageValues = {
   file: null,
@@ -21,11 +21,18 @@ export const UploadVideo: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [videoInfo, setVideoInfo] = useState<{ duration: number; width: number; height: number } | null>(null);
+  const [videoInfo, setVideoInfo] = useState<{
+    duration: number;
+    width: number;
+    height: number;
+  } | null>(null);
   const [uploadMode, setUploadMode] = useState<'normal' | 'chunked'>('normal');
-  const [chunkProgress, setChunkProgress] = useState<{ current: number; total: number } | null>(null);
+  const [chunkProgress, setChunkProgress] = useState<{
+    current: number;
+    total: number;
+  } | null>(null);
 
-  const { setBanner, Banner } = useBanner()
+  const { setBanner, Banner } = useBanner();
 
   const stopUpload = useCallback(() => {
     setIsUploading(false);
@@ -33,50 +40,74 @@ export const UploadVideo: React.FC = () => {
     setChunkProgress(null);
   }, []);
 
-  const handleFileSelect = useCallback(async (
-    file: File | undefined,
-    setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => void
-  ) => {
-    if (!file) return;
+  const handleFileSelect = useCallback(
+    async (
+      file: File | undefined,
+      setFieldValue: (
+        field: string,
+        value: unknown,
+        shouldValidate?: boolean
+      ) => void
+    ) => {
+      if (!file) return;
 
-    if (file.type.startsWith('video/')) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+      if (file.type.startsWith('video/')) {
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
 
-      try {
-        const info = await getVideoInfo(file);
-        setVideoInfo(info);
-      } catch (error) {
-        console.error('Error getting video info:', error);
-        setVideoInfo(null);
+        try {
+          const info = await getVideoInfo(file);
+          setVideoInfo(info);
+        } catch (error) {
+          console.error('Error getting video info:', error);
+          setVideoInfo(null);
+        }
       }
-    }
 
-    await setFieldValue("file", file, true);
-  }, []);
+      await setFieldValue('file', file, true);
+    },
+    []
+  );
 
-  const handleDrop = useCallback(async (
-    e: React.DragEvent<HTMLLabelElement>,
-    setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => void
-  ) => {
-    e.preventDefault();
-    const f = e.dataTransfer.files?.[0];
-    handleFileSelect(f, setFieldValue);
-  }, []);
+  const handleDrop = useCallback(
+    async (
+      e: React.DragEvent<HTMLLabelElement>,
+      setFieldValue: (
+        field: string,
+        value: unknown,
+        shouldValidate?: boolean
+      ) => void
+    ) => {
+      e.preventDefault();
+      const f = e.dataTransfer.files?.[0];
+      handleFileSelect(f, setFieldValue);
+    },
+    []
+  );
 
-  const handleFileChange = useCallback(async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => void
-  ) => {
-    const file = e.target.files?.[0];
-    handleFileSelect(file, setFieldValue);
-  }, []);
+  const handleFileChange = useCallback(
+    async (
+      e: React.ChangeEvent<HTMLInputElement>,
+      setFieldValue: (
+        field: string,
+        value: unknown,
+        shouldValidate?: boolean
+      ) => void
+    ) => {
+      const file = e.target.files?.[0];
+      handleFileSelect(file, setFieldValue);
+    },
+    []
+  );
 
-  const dropHandlers = useMemo(() => ({
-    onDragOver: (e: React.DragEvent) => e.preventDefault(),
-    onDragEnter: (e: React.DragEvent) => e.preventDefault(),
-    onDragLeave: (e: React.DragEvent) => e.preventDefault(),
-  }), []);
+  const dropHandlers = useMemo(
+    () => ({
+      onDragOver: (e: React.DragEvent) => e.preventDefault(),
+      onDragEnter: (e: React.DragEvent) => e.preventDefault(),
+      onDragLeave: (e: React.DragEvent) => e.preventDefault(),
+    }),
+    []
+  );
 
   useEffect(() => {
     return () => {
@@ -86,9 +117,12 @@ export const UploadVideo: React.FC = () => {
     };
   }, [previewUrl]);
 
-  const handleSubmit = async (values: UploadImageValues, { setSubmitting, resetForm }: any) => {
+  const handleSubmit = async (
+    values: UploadImageValues,
+    { setSubmitting, resetForm }: any
+  ) => {
     if (!values.file) {
-      setBanner({ type: "error", msg: "Please select a file to upload" });
+      setBanner({ type: 'error', msg: 'Please select a file to upload' });
       return;
     }
 
@@ -97,15 +131,15 @@ export const UploadVideo: React.FC = () => {
       const maxSize = 10 * 1024 * 1024; // 10MB
       const validation = validateVideoFile(values.file, maxSize);
       if (!validation.isValid) {
-        setBanner({ type: "error", msg: validation.error });
+        setBanner({ type: 'error', msg: validation.error });
         return;
       }
     } else {
       const maxSize = 5 * 1000 * 1024 * 1024; // 5GB
-      console.log(values)
+      console.log(values);
       const validation = validateVideoFile(values.file, maxSize);
       if (!validation.isValid) {
-        setBanner({ type: "error", msg: validation.error });
+        setBanner({ type: 'error', msg: validation.error });
         return;
       }
     }
@@ -123,26 +157,29 @@ export const UploadVideo: React.FC = () => {
         uploadResult = await uploadVideoInChunks(
           values.file,
           1024 * 1024, // 1MB chunks
-          (progress) => setUploadProgress(progress),
+          progress => setUploadProgress(progress),
           (current, total) => setChunkProgress({ current, total })
         );
       } else {
-        uploadResult = await uploadVideoWithProgress(
-          values.file,
-          (progress) => setUploadProgress(progress)
+        uploadResult = await uploadVideoWithProgress(values.file, progress =>
+          setUploadProgress(progress)
         );
       }
 
       setIsUploading(false);
       setBanner({
-        type: "success",
-        msg: (<div>
-          <p>Video uploaded successfully!</p>
-          <p>File: {uploadResult.originalName}</p>
-          {videoInfo && (
-            <p>Duration: {Math.round(videoInfo.duration)}s, Resolution: {videoInfo.width}x{videoInfo.height}</p>
-          )}
-        </div>)
+        type: 'success',
+        msg: (
+          <div>
+            <p>Video uploaded successfully!</p>
+            <p>File: {uploadResult.originalName}</p>
+            {videoInfo && (
+              <p>
+                Resolution: {videoInfo.width}x{videoInfo.height}
+              </p>
+            )}
+          </div>
+        ),
       });
 
       resetForm();
@@ -155,8 +192,8 @@ export const UploadVideo: React.FC = () => {
       setUploadProgress(0);
       setChunkProgress(null);
       setBanner({
-        type: "error",
-        msg: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        type: 'error',
+        msg: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       });
     } finally {
       setSubmitting(false);
@@ -171,28 +208,32 @@ export const UploadVideo: React.FC = () => {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => setUploadMode(uploadMode === 'normal' ? 'chunked' : 'normal')}
+              onClick={() =>
+                setUploadMode(uploadMode === 'normal' ? 'chunked' : 'normal')
+              }
               className="px-4 py-2 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
-              {uploadMode === 'normal' ? 'Switch to Chunked' : 'Switch to Normal'}
+              {uploadMode === 'normal'
+                ? 'Switch to Chunked'
+                : 'Switch to Normal'}
             </button>
           </div>
         </div>
 
         <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
           <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
-            Upload Mode: {uploadMode === 'normal' ? 'Normal Upload' : 'Chunked Upload'}
+            Upload Mode:{' '}
+            {uploadMode === 'normal' ? 'Normal Upload' : 'Chunked Upload'}
           </h3>
           <p className="text-sm text-blue-700 dark:text-blue-300">
             {uploadMode === 'normal'
               ? 'Upload video file directly to server'
-              : 'Upload video in chunks for better handling of large files'
-            }
+              : 'Upload video in chunks for better handling of large files'}
           </p>
         </div>
 
         {/* {banner && (<BannerError type={banner?.type || "success"} msg={banner?.msg || ""} />)} */}
-        < Banner />
+        <Banner />
 
         <Formik<UploadImageValues>
           initialValues={initialValues}
@@ -219,7 +260,7 @@ export const UploadVideo: React.FC = () => {
                       type="button"
                       onClick={() => {
                         setPreviewUrl(null);
-                        setFieldValue("file", null);
+                        setFieldValue('file', null);
                         setVideoInfo(null);
                       }}
                       className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
@@ -229,9 +270,12 @@ export const UploadVideo: React.FC = () => {
                   </div>
                   {videoInfo && (
                     <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                      Duration: {Math.round(videoInfo.duration)}s |
-                      Resolution: {videoInfo.width}×{videoInfo.height} |
-                      Size: {(values.file?.size ? (values.file.size / (1024 * 1024)).toFixed(2) : '0.00')}MB
+                      Duration: {Math.round(videoInfo.duration)}s | Resolution:{' '}
+                      {videoInfo.width}×{videoInfo.height} | Size:{' '}
+                      {values.file?.size
+                        ? (values.file.size / (1024 * 1024)).toFixed(2)
+                        : '0.00'}
+                      MB
                     </div>
                   )}
                 </div>
@@ -240,15 +284,18 @@ export const UploadVideo: React.FC = () => {
               <label
                 htmlFor="video-input"
                 className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-700"
-                onDrop={(e) => handleDrop(e, setFieldValue)}
+                onDrop={e => handleDrop(e, setFieldValue)}
                 {...dropHandlers}
               >
                 <div className="flex flex-col items-center justify-center p-6 text-center">
                   <p className="mb-1 text-sm text-gray-600 dark:text-gray-300">
-                    <span className="font-medium">Click to select</span> or drag & drop
+                    <span className="font-medium">Click to select</span> or drag
+                    & drop
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {values.file ? `Selected: ${values.file.name}` : `Video files (${SUPPORTED_VIDEO_TYPES.map(t => t.split('/')[1]).join(', ')})`}
+                    {values.file
+                      ? `Selected: ${values.file.name}`
+                      : `Video files (${SUPPORTED_VIDEO_TYPES.map(t => t.split('/')[1]).join(', ')})`}
                   </p>
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                     Max size: {uploadMode === 'normal' ? '10MB' : '5GB'}
@@ -260,18 +307,23 @@ export const UploadVideo: React.FC = () => {
                   type="file"
                   accept="video/*"
                   className="hidden"
-                  onChange={(e) => handleFileChange(e, setFieldValue)}
+                  onChange={e => handleFileChange(e, setFieldValue)}
                 />
               </label>
 
               {touched.file && errors.file && (
-                <div className="text-xs text-red-600" role="alert">{errors.file as string}</div>
+                <div className="text-xs text-red-600" role="alert">
+                  {errors.file as string}
+                </div>
               )}
 
               {/* Progress Bars */}
               {isUploading && (
                 <div className="space-y-3">
-                  <ProgressBar progress={uploadProgress} stopUpload={stopUpload} />
+                  <ProgressBar
+                    progress={uploadProgress}
+                    stopUpload={stopUpload}
+                  />
                   {chunkProgress && uploadMode === 'chunked' && (
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       Chunk: {chunkProgress.current}/{chunkProgress.total}
@@ -281,16 +333,21 @@ export const UploadVideo: React.FC = () => {
               )}
 
               <label className="inline-flex items-center gap-2 text-sm">
-                <Field type="checkbox" name="acceptTerms" /> I accept the terms *
+                <Field type="checkbox" name="acceptTerms" /> I accept the terms
+                *
               </label>
               {touched.acceptTerms && (errors.acceptTerms as string) && (
-                <div className="-mt-1 text-xs text-red-600" role="alert">{errors.acceptTerms as string}</div>
+                <div className="-mt-1 text-xs text-red-600" role="alert">
+                  {errors.acceptTerms as string}
+                </div>
               )}
 
               <div className="flex items-center gap-3">
-                <SubmitButton isUpLoading={isUploading} uploadMode={uploadMode} />
+                <SubmitButton
+                  isUpLoading={isUploading}
+                  uploadMode={uploadMode}
+                />
               </div>
-
             </Form>
           )}
         </Formik>

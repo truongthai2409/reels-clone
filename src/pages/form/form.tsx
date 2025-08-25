@@ -1,16 +1,16 @@
-import { useRef, useState } from "react";
-import { Formik, Form } from "formik";
-import { handleProfileSubmit, loadDraft } from "@/services/form.service";
-import type { ProfileFormValues } from "@/types/form.types";
-import { ThemeProvider } from "@/contexts/theme";
-import { DarkModeToggle } from "@/components/ui";
-import { SubmitButton } from "@/components/form";
-import { ExperiencesSection } from "./experience/experience_section";
-import { ProfileSchema } from "@/helpers/validations/form.schema";
-import { BasicInfoSection, FormDebug, AutosaveDraft } from "./profile";
+import { useRef, useState } from 'react';
+import { Formik, Form } from 'formik';
+import { handleProfileSubmit, loadDraft } from '@/services/form.service';
+import type { ProfileFormValues } from '@/types/form.types';
+import { ThemeProvider } from '@/contexts/theme';
+import { DarkModeToggle } from '@/components/ui';
+import { SubmitButton } from '@/components/form';
+import { ExperiencesSection } from './experience/experience_section';
+import { ProfileSchema } from '@/helpers/validations/form.schema';
+import { BasicInfoSection, FormDebug, AutosaveDraft } from './profile';
 
 interface BannerType {
-  type: "success" | "error";
+  type: 'success' | 'error';
   msg: string | React.ReactNode;
 }
 
@@ -35,15 +35,16 @@ export default function ProfileForm() {
           {banner && (
             <div
               role="status"
-              className={`mb-4 rounded-xl px-4 py-3 text-sm ${banner.type === "success"
-                ? "bg-green-50 text-green-700 dark:bg-green-900 dark:text-green-100"
-                : "bg-red-50 text-red-700 dark:bg-red-900 dark:text-red-100"
-                }`}
+              className={`mb-4 rounded-xl px-4 py-3 text-sm ${
+                banner.type === 'success'
+                  ? 'bg-green-50 text-green-700 dark:bg-green-900 dark:text-green-100'
+                  : 'bg-red-50 text-red-700 dark:bg-red-900 dark:text-red-100'
+              }`}
             >
               {banner.msg}
             </div>
           )}
-          
+
           {/* Formik */}
           <Formik<ProfileFormValues>
             initialValues={initialValues}
@@ -51,12 +52,12 @@ export default function ProfileForm() {
             validateOnChange
             validateOnMount
             enableReinitialize={false}
-            validate={(values) => {
+            validate={values => {
               const res = ProfileSchema.safeParse(values);
               if (res.success) return {};
               const formErrors: Record<string, string> = {};
               res.error.issues.forEach((issue: any) => {
-                const path = issue.path.join(".");
+                const path = issue.path.join('.');
                 if (path) formErrors[path] = issue.message;
               });
               return formErrors;
@@ -79,16 +80,28 @@ export default function ProfileForm() {
               return (
                 <Form className="space-y-8">
                   {/* Basic Info */}
-                  <BasicInfoSection values={values} aboutLen={aboutLen} aboutNearLimit={aboutNearLimit} setFieldValue={setFieldValue} />
+                  <BasicInfoSection
+                    values={values}
+                    aboutLen={aboutLen}
+                    aboutNearLimit={aboutNearLimit}
+                    setFieldValue={setFieldValue}
+                  />
 
                   {/* Experiences */}
-                  <ExperiencesSection values={values} setFieldValue={setFieldValue} />
+                  <ExperiencesSection
+                    values={values}
+                    setFieldValue={setFieldValue}
+                  />
 
                   {/* Submit */}
                   <SubmitButton isValid={isValid} isSubmitting={isSubmitting} />
 
                   {/* Debug */}
-                  <FormDebug values={values} errors={errors} touched={touched} />
+                  <FormDebug
+                    values={values}
+                    errors={errors}
+                    touched={touched}
+                  />
 
                   <AutosaveDraft values={values} savingRef={savingRef} />
                 </Form>

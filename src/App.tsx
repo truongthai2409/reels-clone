@@ -2,40 +2,40 @@ import {
   createBrowserRouter,
   Navigate,
   RouterProvider,
-} from "react-router-dom";
+} from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from '@/configs/apollo';
 
-import useAuthStore from "@/stores/authStore";
-import SignIn from "@/pages/sign_in/sign_in";
-import ProfileForm from "@/pages/form/form";
-import DragDropList from "@/pages/dragdrop/dnd";
-import Home from "@/pages/home/home";
-import Upload from "@/pages/upload/upload";
+import useAuthStore from '@/stores/authStore';
+import SignIn from '@/pages/sign_in/sign_in';
+import ProfileForm from '@/pages/form/form';
+import DragDropList from '@/pages/dragdrop/dnd';
+import Home from '@/pages/home/home';
+import Upload from '@/pages/upload/upload';
 
 function App() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const router = createBrowserRouter([
     {
-      path: "/",
+      path: '/',
       element: isAuthenticated ? <Home /> : <Navigate to="/auth" />,
     },
     {
-      path: "/auth",
+      path: '/auth',
       element: <SignIn />,
     },
     {
-      path: "/form",
+      path: '/form',
       element: <ProfileForm />,
     },
     {
-      path: "/dragdrop",
+      path: '/dragdrop',
       element: <DragDropList />,
     },
-    
+
     {
-      path: "/upload",
+      path: '/upload',
       element: <Upload />,
     },
   ]);

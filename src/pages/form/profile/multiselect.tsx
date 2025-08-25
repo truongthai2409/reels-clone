@@ -1,20 +1,21 @@
-import { useMemo, useState } from "react";
-import { NATIONALITIES } from "@/constraints/form.constraints";  
+import { useMemo, useState } from 'react';
+import { NATIONALITIES } from '@/constraints/form.constraints';
 
 export function MultiSelect({
   value,
   onChange,
   label,
-  placeholder = "Search nationality…",
+  placeholder = 'Search nationality…',
 }: {
   value: string[];
   onChange: (next: string[]) => void;
   label: string;
   placeholder?: string;
-}) {  
-  const [query, setQuery] = useState("");
+}) {
+  const [query, setQuery] = useState('');
   const filtered = useMemo(
-    () => NATIONALITIES.filter((n) => n.toLowerCase().includes(query.toLowerCase())),
+    () =>
+      NATIONALITIES.filter(n => n.toLowerCase().includes(query.toLowerCase())),
     [query]
   );
 
@@ -33,10 +34,10 @@ export function MultiSelect({
           className="w-full border rounded-lg px-3 py-2 mb-2 outline-none"
           placeholder={placeholder}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={e => setQuery(e.target.value)}
         />
         <div className="max-h-40 overflow-auto space-y-1">
-          {filtered.map((n) => (
+          {filtered.map(n => (
             <label key={n} className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
@@ -52,8 +53,11 @@ export function MultiSelect({
         </div>
         {value.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
-            {value.map((n) => (
-              <span key={n} className="text-xs dark:text-black bg-gray-100 rounded-lg px-2 py-1">
+            {value.map(n => (
+              <span
+                key={n}
+                className="text-xs dark:text-black bg-gray-100 rounded-lg px-2 py-1"
+              >
                 {n}
               </span>
             ))}

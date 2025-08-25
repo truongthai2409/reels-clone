@@ -1,4 +1,4 @@
-import { useField } from "formik";
+import { useField } from 'formik';
 
 type Option = { value: string; label: string };
 
@@ -26,7 +26,7 @@ export const CustomRadioGroup: React.FC<RadioGroupProps> = ({
       )}
 
       <div className="flex items-center gap-4">
-        {options.map((opt) => (
+        {options.map(opt => (
           <label key={opt.value} className="flex items-center gap-2 text-sm">
             <input
               type="radio"

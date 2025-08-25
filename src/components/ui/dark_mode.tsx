@@ -1,16 +1,16 @@
-import { useTheme } from "@/contexts/theme";
+import { useTheme } from '@/contexts/theme';
 
 export function DarkModeToggle() {
-    const { dark, toggle } = useTheme();
-    return (
-        <button
-            type="button"
-            className="px-3 py-2 rounded-xl border text-sm"
-            onClick={toggle}
-            aria-pressed={dark}
-            aria-label="Toggle dark mode"
-        >
-            {dark ? "🌙 Dark" : "☀️ Light"}
-        </button>
-    );
+  const { dark, toggle } = useTheme();
+  return (
+    <button
+      type="button"
+      className="px-3 py-2 rounded-xl border text-sm"
+      onClick={toggle}
+      aria-pressed={dark}
+      aria-label="Toggle dark mode"
+    >
+      {dark ? '🌙 Dark' : '☀️ Light'}
+    </button>
+  );
 }

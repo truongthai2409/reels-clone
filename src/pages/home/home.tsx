@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Share2,
   MessageCircle,
@@ -11,9 +11,9 @@ import {
   Fullscreen,
   Volume2,
   Pause,
-} from "lucide-react";
-import Sidebar from "@/components/ui/sidebar";
-import { shortsData } from "@/constraints/home.constraints";
+} from 'lucide-react';
+import Sidebar from '@/components/ui/sidebar';
+import { shortsData } from '@/constraints/home.constraints';
 
 const Home: React.FC = () => {
   const [current, setCurrent] = useState(0);
@@ -28,7 +28,11 @@ const Home: React.FC = () => {
         const scrollTop = sliderRef.current.scrollTop;
         const videoHeight = sliderRef.current.clientHeight;
         const newIndex = Math.round(scrollTop / videoHeight);
-        if (newIndex !== current && newIndex >= 0 && newIndex < shortsData.length) {
+        if (
+          newIndex !== current &&
+          newIndex >= 0 &&
+          newIndex < shortsData.length
+        ) {
           setCurrent(newIndex);
         }
       }
@@ -44,7 +48,7 @@ const Home: React.FC = () => {
   const nextVideo = () => {
     if (current < shortsData.length - 1) {
       setDirection(1);
-      setCurrent((prev) => prev + 1);
+      setCurrent(prev => prev + 1);
       // Scroll to the next video
       if (sliderRef.current) {
         const nextScrollTop = (current + 1) * sliderRef.current.clientHeight;
@@ -56,7 +60,7 @@ const Home: React.FC = () => {
   const prevVideo = () => {
     if (current > 0) {
       setDirection(-1);
-      setCurrent((prev) => prev - 1);
+      setCurrent(prev => prev - 1);
       // Scroll to the previous video
       if (sliderRef.current) {
         const prevScrollTop = (current - 1) * sliderRef.current.clientHeight;
@@ -95,22 +99,22 @@ const Home: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key || event.code) {
-        case "ArrowUp":
+        case 'ArrowUp':
           prevVideo();
           break;
-        case "ArrowDown":
+        case 'ArrowDown':
           nextVideo();
           break;
-        case "f":
-        case "F":
+        case 'f':
+        case 'F':
           toggleFullscreen();
           break;
-        case "m":
-        case "M":
+        case 'm':
+        case 'M':
           toggleMute();
           break;
-        case " ":
-        case "32":
+        case ' ':
+        case '32':
           togglePlayPause();
           break;
         default:
@@ -118,9 +122,9 @@ const Home: React.FC = () => {
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [current]);
 
@@ -132,7 +136,7 @@ const Home: React.FC = () => {
         </div>
         <div className="flex-1 relative">
           {/* Vertical slider container with scroll-snap */}
-          <div 
+          <div
             ref={sliderRef}
             className="h-screen overflow-y-auto scroll-smooth scrollbar-hide"
             style={{ scrollSnapType: 'y mandatory' }}
@@ -202,7 +206,7 @@ const Home: React.FC = () => {
 
                   <button className="flex flex-col items-center p-2">
                     <div className="bg-gray-100 rounded-full p-3 hover:bg-gray-200 transition-colors">
-                      <ThumbsUp className="h-6 w-6"/>
+                      <ThumbsUp className="h-6 w-6" />
                     </div>
                     <span className="text-xs text-white md:text-black mt-2">
                       {short.likes}
@@ -213,7 +217,9 @@ const Home: React.FC = () => {
                     <div className="bg-gray-100 rounded-full p-3 hover:bg-gray-200 transition-colors">
                       <ThumbsDown className="h-6 w-6" />
                     </div>
-                    <span className="text-xs text-white md:text-black mt-1">Không…</span>
+                    <span className="text-xs text-white md:text-black mt-1">
+                      Không…
+                    </span>
                   </button>
 
                   <button className="flex flex-col items-center">
@@ -229,14 +235,18 @@ const Home: React.FC = () => {
                     <div className="bg-gray-100 rounded-full p-3 hover:bg-gray-200 transition-colors">
                       <Share2 className="h-6 w-6" />
                     </div>
-                    <span className="text-xs mt-1 text-white md:text-black">Chia sẻ</span>
+                    <span className="text-xs mt-1 text-white md:text-black">
+                      Chia sẻ
+                    </span>
                   </button>
 
                   <button className="flex flex-col items-center">
                     <div className="bg-gray-100 rounded-full p-3 hover:bg-gray-200 transition-colors">
                       <Music2 className="h-6 w-6" />
                     </div>
-                    <span className="text-xs mt-1 text-white md:text-black">5</span>
+                    <span className="text-xs mt-1 text-white md:text-black">
+                      5
+                    </span>
                   </button>
                 </div>
               </div>

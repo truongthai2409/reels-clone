@@ -1,4 +1,4 @@
-import { Home, PlaySquare, ListVideo, History, Clock } from "lucide-react";
+import { Home, PlaySquare, ListVideo, History, Clock } from 'lucide-react';
 
 export default function Sidebar() {
   return (

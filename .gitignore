@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Husky
+.husky/_
+
+# Prettier
+.prettierrc
+.prettierignore

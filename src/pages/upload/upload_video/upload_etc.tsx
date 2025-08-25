@@ -1,9 +1,9 @@
-import { Formik, Form } from "formik";
-import React, { useState } from "react";
-import { InputField } from "@/components/upload";
-import { UploadField } from "@/components/upload/upload_field";
-import { validationSchemaImage } from "@/helpers/validations/upload.schema";
-import { SubmitButton } from "@/components/upload/submit_button";
+import { Formik, Form } from 'formik';
+import React, { useState } from 'react';
+import { InputField } from '@/components/upload';
+import { UploadField } from '@/components/upload/upload_field';
+import { validationSchemaImage } from '@/helpers/validations/upload.schema';
+import { SubmitButton } from '@/components/upload/submit_button';
 
 interface FormValues {
   file: File | null;
@@ -18,24 +18,24 @@ export const UploadEtc: React.FC = () => {
   const upload = async (file: File) => {
     setUploading(true);
     try {
-      await new Promise((r) => setTimeout(r, 2000));
-      console.log("Uploaded:", file);
+      await new Promise(r => setTimeout(r, 2000));
+      console.log('Uploaded:', file);
     } catch (error) {
-      console.error("Upload failed:", error);
+      console.error('Upload failed:', error);
     } finally {
       setUploading(false);
     }
   };
 
   const handleSubmit = async (values: FormValues) => {
-    console.log("submit", values)
+    console.log('submit', values);
     try {
       if (values.file) {
         await upload(values.file);
       }
-      console.log("Form submitted successfully:", values);
+      console.log('Form submitted successfully:', values);
     } catch (error) {
-      console.error("Form submission failed:", error);
+      console.error('Form submission failed:', error);
     }
   };
 
@@ -43,8 +43,8 @@ export const UploadEtc: React.FC = () => {
     <Formik<FormValues>
       initialValues={{
         file: null,
-        username: "",
-        password: "",
+        username: '',
+        password: '',
         acceptTerms: false,
       }}
       validationSchema={validationSchemaImage}
@@ -54,11 +54,18 @@ export const UploadEtc: React.FC = () => {
       enableReinitialize={false}
     >
       <Form className="p-4 border rounded max-w-md mx-auto">
-        <h2 className="text-2xl font-bold mb-6 text-center">Video Upload Form</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          Video Upload Form
+        </h2>
 
         <InputField name="username" label="Username" type="text" />
         <InputField name="password" label="Password" type="password" />
-        <UploadField name="file" label="Video File" accept="video/*" maxSize={5 * 1024 * 1024} />
+        <UploadField
+          name="file"
+          label="Video File"
+          accept="video/*"
+          maxSize={5 * 1024 * 1024}
+        />
 
         <div className="mb-4">
           <label className="flex items-center gap-2">
@@ -77,7 +84,7 @@ export const UploadEtc: React.FC = () => {
             Uploading...
           </div>
         )}
-        <SubmitButton isUpLoading={uploading}/>
+        <SubmitButton isUpLoading={uploading} />
       </Form>
     </Formik>
   );

@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useNavigate } from "react-router-dom";
-import useAuthStore from "@/stores/authStore"; 
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { useNavigate } from 'react-router-dom';
+import useAuthStore from '@/stores/authStore';
 
 // Định nghĩa type cho form
 interface SignInForm {
@@ -15,16 +15,16 @@ interface SignInForm {
 const schema = yup.object().shape({
   email: yup
     .string()
-    .required("Email is required")
-    .email("Invalid email format"),
+    .required('Email is required')
+    .email('Invalid email format'),
   password: yup
     .string()
-    .required("Password is required")
-    .min(6, "Password must be at least 6 characters"),
+    .required('Password is required')
+    .min(6, 'Password must be at least 6 characters'),
 });
 
 const SignIn: React.FC = () => {
-  const login = useAuthStore((state) => state.login);
+  const login = useAuthStore(state => state.login);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -39,12 +39,12 @@ const SignIn: React.FC = () => {
   // Hàm submit form
   const onSubmit = (data: SignInForm) => {
     const { email, password } = data;
-    if (email === "admin@gmail.com" && password === "123456") {
+    if (email === 'admin@gmail.com' && password === '123456') {
       login(); // Gọi hàm login từ authStore
-      navigate("/"); // Chuyển hướng về trang Home
+      navigate('/'); // Chuyển hướng về trang Home
       setErrorMessage(null); // Xóa thông báo lỗi (nếu có)
     } else {
-      setErrorMessage("Invalid email or password"); // Hiển thị lỗi
+      setErrorMessage('Invalid email or password'); // Hiển thị lỗi
     }
   };
 
@@ -70,7 +70,7 @@ const SignIn: React.FC = () => {
               <input
                 id="email"
                 type="email"
-                {...register("email")}
+                {...register('email')}
                 autoComplete="email"
                 className="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 focus:outline-none sm:text-sm"
               />
@@ -104,7 +104,7 @@ const SignIn: React.FC = () => {
               <input
                 id="password"
                 type="password"
-                {...register("password")}
+                {...register('password')}
                 autoComplete="current-password"
                 className="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 focus:outline-none sm:text-sm"
               />
@@ -134,7 +134,7 @@ const SignIn: React.FC = () => {
         </form>
 
         <p className="mt-8 text-center text-sm text-gray-500">
-          Not a member?{" "}
+          Not a member?{' '}
           <a
             href="#"
             className="font-semibold text-indigo-500 hover:text-indigo-400"

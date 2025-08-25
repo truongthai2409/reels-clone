@@ -1,5 +1,5 @@
-import type z from "zod";
-import type { ProfileSchema } from "@/helpers/validations/form.schema";
+import type z from 'zod';
+import type { ProfileSchema } from '@/helpers/validations/form.schema';
 
 export type ProfileFormValues = z.infer<typeof ProfileSchema>;
 

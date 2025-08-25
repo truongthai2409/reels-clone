@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface FormDebugProps {
   values: any;
@@ -6,7 +6,11 @@ interface FormDebugProps {
   touched: any;
 }
 
-export const FormDebug: React.FC<FormDebugProps> = ({ values, errors, touched }) => {
+export const FormDebug: React.FC<FormDebugProps> = ({
+  values,
+  errors,
+  touched,
+}) => {
   return (
     <details className="mt-6">
       <summary className="cursor-pointer text-sm text-gray-600 dark:text-gray-400">

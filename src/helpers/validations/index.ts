@@ -1,2 +1,2 @@
-export * from "./form.schema"
-export * from "./upload.schema"
+export * from './form.schema';
+export * from './upload.schema';

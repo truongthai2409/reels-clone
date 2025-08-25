@@ -1,23 +1,23 @@
-import { STORAGE_KEY, todayISO } from "@/configs";
-import type { ProfileFormValues } from "@/types/form.types";
+import { STORAGE_KEY, todayISO } from '@/configs';
+import type { ProfileFormValues } from '@/types/form.types';
 
 const DEFAULT_VALUES: ProfileFormValues = {
-  name: "",
-  email: "",
-  aboutMe: "",
-  birthday: "",
-  gender: "other",
+  name: '',
+  email: '',
+  aboutMe: '',
+  birthday: '',
+  gender: 'other',
   nationality: [],
-  website: "",
+  website: '',
   acceptTerms: false,
   experiences: [
     {
       id: Date.now().toString(), // Thêm id
-      company: "",
-      role: "",
+      company: '',
+      role: '',
       startDate: todayISO(),
-      endDate: "",
-      highlights: [""],
+      endDate: '',
+      highlights: [''],
     },
   ],
 };
@@ -57,16 +57,16 @@ export const handleProfileSubmit = async (
   setSubmitting(true);
 
   try {
-    await new Promise((r) => setTimeout(r, 1200)); // Fake API
+    await new Promise(r => setTimeout(r, 1200)); // Fake API
     localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
     setBanner({
-      type: "success",
-      msg: "Profile saved successfully!",
+      type: 'success',
+      msg: 'Profile saved successfully!',
     });
   } catch {
     setBanner({
-      type: "error",
-      msg: "Failed to submit. Please try again.",
+      type: 'error',
+      msg: 'Failed to submit. Please try again.',
     });
   } finally {
     setSubmitting(false);

@@ -1,6 +1,6 @@
-import { useEffect, useRef, type RefObject } from "react";
-import type { ProfileFormValues } from "@/types/form.types";
-import { STORAGE_KEY } from "@/configs";
+import { useEffect, useRef, type RefObject } from 'react';
+import type { ProfileFormValues } from '@/types/form.types';
+import { STORAGE_KEY } from '@/configs';
 
 export function AutosaveDraft({
   values,
@@ -21,13 +21,11 @@ export function AutosaveDraft({
 
     savingRef.current = setTimeout(() => {
       try {
-        console.log("Saving draft:", values);
+        console.log('Saving draft:', values);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
-      } catch { }
+      } catch {}
     }, 1000);
   }, [values]);
 
-
   return null;
 }
-

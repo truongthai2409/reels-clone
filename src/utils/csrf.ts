@@ -7,13 +7,13 @@
 //  */
 // export function setCSRFTokenInMeta(token: string): void {
 //   let metaTag = document.querySelector('meta[name="csrf-token"]');
-  
+
 //   if (!metaTag) {
 //     metaTag = document.createElement('meta');
 //     metaTag.setAttribute('name', 'csrf-token');
 //     document.head.appendChild(metaTag);
 //   }
-  
+
 //   metaTag.setAttribute('content', token);
 //   console.log('CSRF token set in meta tag');
 // }
@@ -24,7 +24,7 @@
 //  * @param options - Cookie options
 //  */
 // export function setCSRFCookie(
-//   token: string, 
+//   token: string,
 //   options: {
 //     path?: string;
 //     secure?: boolean;
@@ -40,7 +40,7 @@
 //   } = options;
 
 //   let cookieString = `csrf-token=${token}; path=${path}; secure=${secure.toString()}; samesite=${sameSite}`;
-  
+
 //   if (expires) {
 //     cookieString += `; expires=${expires.toUTCString()}`;
 //   }
@@ -60,7 +60,7 @@
 //     const token = metaTag.getAttribute('content');
 //     if (token) return token;
 //   }
-  
+
 //   // Try cookies
 //   const cookies = document.cookie.split(';');
 //   for (const cookie of cookies) {
@@ -69,7 +69,7 @@
 //       return value;
 //     }
 //   }
-  
+
 //   return null;
 // }
 
@@ -99,11 +99,11 @@
 //         'Accept': 'application/json',
 //       }
 //     });
-    
+
 //     if (response.ok) {
 //       const data = await response.json();
 //       const token = data.csrfToken || data.token || data.csrf_token;
-      
+
 //       if (token) {
 //         // Auto-set the token in meta tag and cookies
 //         setCSRFTokenInMeta(token);
@@ -115,7 +115,7 @@
 //   } catch (error) {
 //     console.error('Failed to refresh CSRF token:', error);
 //   }
-  
+
 //   return null;
 // }
 
@@ -126,18 +126,18 @@
 //  * @returns Function to stop the auto-refresh
 //  */
 // export function startCSRFAutoRefresh(
-//   intervalMinutes: number = 5, 
+//   intervalMinutes: number = 5,
 //   endpoint: string = '/api/csrf-token'
 // ): () => void {
 //   const intervalMs = intervalMinutes * 60 * 1000;
-  
+
 //   const intervalId = setInterval(async () => {
 //     const newToken = await refreshCSRFToken(endpoint);
 //     if (newToken) {
 //       console.log(`CSRF token auto-refreshed every ${intervalMinutes} minutes`);
 //     }
 //   }, intervalMs);
-  
+
 //   // Return function to stop auto-refresh
 //   return () => {
 //     clearInterval(intervalId);
@@ -159,24 +159,24 @@
 //   endpoint: string = '/api/csrf-token'
 // ): { stopAutoRefresh: () => void } {
 //   console.log('Initializing CSRF token management...');
-  
+
 //   // Set initial token if provided
 //   if (initialToken) {
 //     setCSRFTokenInMeta(initialToken);
 //     setCSRFCookie(initialToken);
 //   }
-  
+
 //   // Check current token status
 //   const status = checkCSRFToken();
 //   console.log('CSRF token status:', status);
-  
+
 //   let stopAutoRefresh: () => void = () => {};
-  
+
 //   // Start auto-refresh if enabled
 //   if (autoRefresh) {
 //     stopAutoRefresh = startCSRFAutoRefresh(refreshInterval, endpoint);
 //   }
-  
+
 //   return { stopAutoRefresh };
 // }
 
@@ -189,11 +189,11 @@
 //   if (metaTag) {
 //     metaTag.remove();
 //   }
-  
+
 //   // Remove from cookies
 //   document.cookie = 'csrf-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 //   document.cookie = 'XSRF-TOKEN=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-  
+
 //   console.log('CSRF token cleared');
 // }
 
@@ -213,11 +213,11 @@
 //  */
 // export function getValidCSRFToken(): string | null {
 //   const token = getCSRFToken();
-  
+
 //   if (token && validateCSRFTokenFormat(token)) {
 //     return token;
 //   }
-  
+
 //   return null;
 // }
 

@@ -1,12 +1,12 @@
-import type { UploadResult } from "@/types/upload.types";
-import type { AxiosProgressEvent } from "axios";
-import { GRAPHQL_ENDPOINT, uploadInstance } from "@/configs";
-import { UPLOAD_MEDIA_MUTATION } from "@/graphql/mutations/upload_file";
-import { validateVideoFile } from "@/helpers/validations";
-import { buildFormData } from "./upload.service";
+import type { UploadResult } from '@/types/upload.types';
+import type { AxiosProgressEvent } from 'axios';
+import { GRAPHQL_ENDPOINT, uploadInstance } from '@/configs';
+import { UPLOAD_MEDIA_MUTATION } from '@/graphql/mutations/upload_file';
+import { validateVideoFile } from '@/helpers/validations';
+import { buildFormData } from './upload.service';
 
 interface ChunkInfo {
-  status: "uploading" | "completed" | "failed" | "cancelled";
+  status: 'uploading' | 'completed' | 'failed' | 'cancelled';
   progress: number;
   uploadedChunks: number;
   totalChunks: number;
@@ -16,7 +16,7 @@ export function getVideoInfo(
   file: File
 ): Promise<{ duration: number; width: number; height: number }> {
   return new Promise((resolve, reject) => {
-    const video = document.createElement("video");
+    const video = document.createElement('video');
     const url = URL.createObjectURL(file);
 
     video.onloadedmetadata = () => {
@@ -31,7 +31,7 @@ export function getVideoInfo(
 
     video.onerror = () => {
       URL.revokeObjectURL(url);
-      reject(new Error("Không thể đọc thông tin video"));
+      reject(new Error('Không thể đọc thông tin video'));
     };
 
     video.src = url;
@@ -64,8 +64,8 @@ export async function uploadVideoWithProgress(
     const result = response.data;
 
     if (result.errors) {
-      console.error("GraphQL errors:", result.errors);
-      throw new Error(result.errors[0]?.message || "GraphQL error occurred");
+      console.error('GraphQL errors:', result.errors);
+      throw new Error(result.errors[0]?.message || 'GraphQL error occurred');
     }
 
     const uploadResult = result.data.uploadMedia;
@@ -80,7 +80,7 @@ export async function uploadVideoWithProgress(
       createdAt: uploadResult.createdAt,
     };
   } catch (error) {
-    console.error("Video upload error:", error);
+    console.error('Video upload error:', error);
     throw error;
   }
 }
@@ -98,12 +98,12 @@ export async function uploadVideoInChunks(
     }
 
     console.warn(
-      "Chunked upload not implemented for GraphQL. Using single file upload instead."
+      'Chunked upload not implemented for GraphQL. Using single file upload instead.'
     );
 
     return await uploadVideoWithProgress(file, onProgress);
   } catch (error) {
-    console.error("Chunked video upload error:", error);
+    console.error('Chunked video upload error:', error);
     throw error;
   }
 }
@@ -111,10 +111,10 @@ export async function uploadVideoInChunks(
 export async function cancelVideoUpload(_uploadId: string): Promise<void> {
   try {
     throw new Error(
-      "Cancel upload not implemented for GraphQL. Implement a cancelUploadMedia mutation."
+      'Cancel upload not implemented for GraphQL. Implement a cancelUploadMedia mutation.'
     );
   } catch (error) {
-    console.error("Cancel upload error:", error);
+    console.error('Cancel upload error:', error);
     throw error;
   }
 }
@@ -124,10 +124,10 @@ export async function getVideoUploadStatus(
 ): Promise<ChunkInfo> {
   try {
     throw new Error(
-      "Get upload status not implemented for GraphQL. Implement a getUploadStatus query."
+      'Get upload status not implemented for GraphQL. Implement a getUploadStatus query.'
     );
   } catch (error) {
-    console.error("Get upload status error:", error);
+    console.error('Get upload status error:', error);
     throw error;
   }
 }

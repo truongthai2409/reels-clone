@@ -1,14 +1,17 @@
-import { FieldArray } from "formik";
-import { InlineError } from "@/components/form";
-import { todayISO } from "@/configs";
-import { ExperienceWrapper } from "./experience_wrapper";
+import { FieldArray } from 'formik';
+import { InlineError } from '@/components/form';
+import { todayISO } from '@/configs';
+import { ExperienceWrapper } from './experience_wrapper';
 
 interface ExperiencesSectionProps {
   values: any;
   setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
 }
 
-export const ExperiencesSection = ({ values, setFieldValue }: ExperiencesSectionProps) => { 
+export const ExperiencesSection = ({
+  values,
+  setFieldValue,
+}: ExperiencesSectionProps) => {
   return (
     <section className="space-y-4 p-4 md:p-6 rounded-2xl border border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between">
@@ -22,11 +25,11 @@ export const ExperiencesSection = ({ values, setFieldValue }: ExperiencesSection
               onClick={() =>
                 push({
                   id: Date.now().toString(),
-                  company: "",
-                  role: "",
+                  company: '',
+                  role: '',
                   startDate: todayISO(),
-                  endDate: "",
-                  highlights: [""],
+                  endDate: '',
+                  highlights: [''],
                 })
               }
             >
