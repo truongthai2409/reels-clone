@@ -17,7 +17,7 @@ import Upload from "@/pages/upload/upload";
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const router = createBrowserRouter([
-     {
+    {
       path: "/",
       element: isAuthenticated ? <Home /> : <Navigate to="/auth" />,
     },
@@ -33,17 +33,17 @@ function App() {
       path: "/dragdrop",
       element: <DragDropList />,
     },
+    
     {
       path: "/upload",
       element: <Upload />,
     },
-
   ]);
   return (
     <ApolloProvider client={apolloClient}>
       {/* <ThemeProvider> */}
-        <RouterProvider router={router} />
-        <Toaster />
+      <RouterProvider router={router} />
+      <Toaster />
       {/* </ThemeProvider> */}
     </ApolloProvider>
   );

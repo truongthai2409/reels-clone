@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Formik, Form, Field } from "formik";
-import { testApolloServer, testUploadMethods } from "@/services/apollo.service";
-// import { testUploadFunction } from "@/services/test_upload";
-import BannerError from "@/components/ui/banner_error";
-import { validateUpload } from "@/helpers/validations";
 import type { UploadImageValues } from "@/types/form.types";
-import { uploadFileWithProgress } from "@/services/upload.service";
+import { uploadImageWithProgress } from "@/services/upload/upload_image.service";
+import { BannerError, ProgressBar } from "@/components/upload";
+import { validateUpload } from "@/helpers/validations/upload.schema";
+
 
 const initialValues: UploadImageValues = {
     file: null,
@@ -15,14 +14,27 @@ const initialValues: UploadImageValues = {
 export const UploadImage: React.FC = () => {
     const [uploadProgress, setUploadProgress] = useState<number>(0);
     const [isUploading, setIsUploading] = useState<boolean>(false);
-    const [banner, setBanner] = useState<null | { type: "success" | "error"; msg: string }>(null);
+    const [banner, setBanner] = useState<null | { type: "success" | "error"; msg: string | React.ReactNode }>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const stopUpload = useCallback(() => {
         setIsUploading(false);
         setUploadProgress(0);
-        // Note: XMLHttpRequest doesn't support easy cancellation in this implementation
-        // For production, you might want to store the xhr instance and call xhr.abort()
     }, []);
+
+    const handleFileSelect = useCallback(async (
+        file: File | undefined,
+        setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => void
+    ) => {
+        if (!file) return;
+
+        if (file.type.startsWith('image/')) {
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+        }
+
+        await setFieldValue("file", file, true);
+
+    }, [])
 
     const handleDrop = useCallback(async (
         e: React.DragEvent<HTMLLabelElement>,
@@ -30,32 +42,15 @@ export const UploadImage: React.FC = () => {
     ) => {
         e.preventDefault();
         const f = e.dataTransfer.files?.[0];
-        if (!f) return;
-
-        // Create preview URL for image
-        if (f.type.startsWith('image/')) {
-            const url = URL.createObjectURL(f);
-            setPreviewUrl(url);
-        }
-
-        await setFieldValue("file", f, true);
+        handleFileSelect(f, setFieldValue);
     }, []);
 
     const handleFileChange = useCallback(async (
         e: React.ChangeEvent<HTMLInputElement>,
         setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => void
     ) => {
-        const f = e.target.files?.[0];
-        if (!f) return;
-
-        // Create preview URL for image
-        if (f.type.startsWith('image/')) {
-            const url = URL.createObjectURL(f);
-            setPreviewUrl(url);
-        }
-
-        await setFieldValue("file", f, true);
-        console.log("Selected file:", f);
+        const file = e.target.files?.[0];
+        handleFileSelect(file, setFieldValue);
     }, []);
 
     const dropHandlers = useMemo(() => ({
@@ -64,7 +59,43 @@ export const UploadImage: React.FC = () => {
         onDragLeave: (e: React.DragEvent) => e.preventDefault(),
     }), []);
 
-    // Cleanup preview URL when component unmounts
+    const handleSubmit = async (values: UploadImageValues, { setSubmitting, resetForm }: any) => {
+        console.log(values);
+        if (!values.file) {
+            setBanner({ type: "error", msg: "Please select a file to upload" });
+            return;
+        }
+
+        setSubmitting(true);
+        setBanner(null);
+        setIsUploading(true);
+        setUploadProgress(0);
+
+        try {
+            const uploadResult = await uploadImageWithProgress(values.file, (progress) => {
+                setUploadProgress(progress);
+            });
+            setIsUploading(false);
+            setBanner({
+                type: "success",
+                msg: (<div>
+                    <p>Image uploaded successfully!</p>
+                    <a href={uploadResult.url} target="_blank">File ID: {uploadResult.originalName}</a>
+                </div>)
+            });
+            resetForm();
+            setUploadProgress(0);
+            setPreviewUrl(null);
+        } catch (error) {
+            setIsUploading(false);
+            setUploadProgress(0);
+            setBanner({ type: "error", msg: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}` });
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    // Cleanup URL
     useEffect(() => {
         return () => {
             if (previewUrl) {
@@ -73,36 +104,11 @@ export const UploadImage: React.FC = () => {
         };
     }, [previewUrl]);
 
-
-
     return (
         <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
             <div className="max-w-2xl mx-auto p-6">
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-semibold">Upload Image with Preview</h1>
-                    <div className="flex gap-2">
-                        <button
-                            type="button"
-                            onClick={testApolloServer}
-                            className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-                        >
-                            Test Server
-                        </button>
-                        <button
-                            type="button"
-                            onClick={testUploadMethods}
-                            className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
-                        >
-                            Test Upload
-                        </button>
-                        {/* <button
-                            type="button"
-                            onClick={testUploadFunction}
-                            className="px-3 py-1 text-sm bg-purple-500 text-white rounded hover:bg-purple-600"
-                        >
-                            Test Simple
-                        </button> */}
-                    </div>
                 </div>
 
                 {banner && (
@@ -116,46 +122,7 @@ export const UploadImage: React.FC = () => {
                     validateOnMount
                     enableReinitialize={false}
                     validate={validateUpload}
-                    onSubmit={async (values, { setSubmitting, resetForm }) => {
-                        if (!values.file) {
-                            setBanner({ type: "error", msg: "Please select a file to upload" });
-                            return;
-                        }
-                        console.log("Submitting values:", values);
-
-                        setSubmitting(true);
-                        setBanner(null);
-                        setIsUploading(true);
-                        setUploadProgress(0);
-
-                        try {
-                            // Upload to GraphQL API with real-time progress
-                            const uploadResult = await uploadFileWithProgress(values.file, (progress) => {
-                                setUploadProgress(progress);
-                            });
-
-                            // Upload completed
-                            setIsUploading(false);
-
-                            setBanner({
-                                type: "success",
-                                msg: `Image uploaded successfully! File ID: ${uploadResult.id}`
-                            });
-
-                            resetForm();
-                            setUploadProgress(0);
-                            setPreviewUrl(null);
-                        } catch (error) {
-                            setIsUploading(false);
-                            setUploadProgress(0);
-                            setBanner({
-                                type: "error",
-                                msg: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-                            });
-                        } finally {
-                            setSubmitting(false);
-                        }
-                    }}
+                    onSubmit={handleSubmit}
                 >
                     {({ values, errors, touched, isSubmitting, setFieldValue }) => (
                         <Form className="space-y-6">
@@ -210,26 +177,7 @@ export const UploadImage: React.FC = () => {
                                 <div className="text-xs text-red-600" role="alert">{errors.file as string}</div>
                             )}
 
-                            {isUploading && (
-                                <div>
-                                    <div className="w-full bg-gray-200 rounded-full h-3">
-                                        <div
-                                            className="bg-blue-500 h-3 rounded-full transition-all"
-                                            style={{ width: `${Math.floor(uploadProgress)}%` }}
-                                        />
-                                    </div>
-                                    <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                                        {Math.floor(uploadProgress)}%
-                                    </div>
-                                    <button
-                                        type="button"
-                                        className="mt-2 px-3 py-1.5 rounded-lg bg-red-500 text-white text-sm"
-                                        onClick={stopUpload}
-                                    >
-                                        Cancel Upload
-                                    </button>
-                                </div>
-                            )}
+                            {isUploading && (<ProgressBar progress={uploadProgress} stopUpload={stopUpload} />)}
 
                             <label className="inline-flex items-center gap-2 text-sm">
                                 <Field type="checkbox" name="acceptTerms" /> I accept the terms *

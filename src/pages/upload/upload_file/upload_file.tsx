@@ -1,258 +1,156 @@
-// import React, { useCallback, useMemo, useState } from "react";
-// import { Formik, Form, Field } from "formik";
-// import { UploadSchema } from "@/helpers/validations";
-// import { ALLOWED_TYPES } from "@/constraints";
-// import { uploadFileWithProgress, testApolloServer, testUploadMethods } from "@/services/apollo.service";
-// import { testUploadFunction } from "@/services/test_upload";
-// import { getFileIcon } from "@/services/upload.service";
-// import BannerError from "@/components/ui/banner_error";
+import React from 'react';
+import { Formik, Form } from "formik";
+import { InputField } from '@/components/upload';
+import { UploadField } from '@/components/upload/upload_field';
+import { validationDemoSchema } from '@/helpers/validations/upload.schema';
 
-// type UploadFileValues = {
-//     file: File | null;
-//     categories: string[];
-//     acceptTerms: boolean;
-// };
+interface FormValues {
+  email: string;
+  phone: string;
+  website: string;
+  age: string;
+  birthDate: string;
+  hobbies: string[];
+  address: {
+    street: string;
+    city: string;
+    zipCode: string;
+    country: string;
+  };
+  hasCompany: boolean;
+  companyName: string;
+  username: string;
+  documents: File | File[] | null;
+}
 
-// const initialValues: UploadFileValues = {
-//     file: null,
-//     categories: [],
-//     acceptTerms: false,
-// };
+export const UploadFile: React.FC = () => {
+  const initialValues: FormValues = {
+    email: "",
+    phone: "",
+    website: "",
+    age: "",
+    birthDate: "",
+    hobbies: [],
+    address: {
+      street: "",
+      city: "",
+      zipCode: "",
+      country: ""
+    },
+    hasCompany: false,
+    companyName: "",
+    username: "",
+    documents: null
+  };
 
-// export const UploadFile: React.FC = () => {
-//     const [uploadProgress, setUploadProgress] = useState<number>(0);
-//     const [isUploading, setIsUploading] = useState<boolean>(false);
-//     const [banner, setBanner] = useState<null | { type: "success" | "error"; msg: string }>(null);
-//     const stopUpload = useCallback(() => {
-//         setIsUploading(false);
-//         setUploadProgress(0);
-//         // Note: XMLHttpRequest doesn't support easy cancellation in this implementation
-//         // For production, you might want to store the xhr instance and call xhr.abort()
-//     }, []);
+  return (
+    <div className="max-w-2xl mx-auto p-6">
+      <h1 className="text-3xl font-bold text-center mb-8">Yup Validation Demo</h1>
 
-//     const validate = useCallback(async (values: UploadFileValues) => {
-//         const res = await UploadSchema.safeParseAsync(values);
-//         if (res.success) return {} as Record<string, string>;
-//         const formErrors: Record<string, string> = {};
-//         res.error.issues.forEach((issue) => {
-//             const path = issue.path.join(".");
-//             if (path) formErrors[path] = issue.message;
-//         });
-//         return formErrors;
-//     }, []);
+      <Formik<FormValues>
+        initialValues={initialValues}
+        validationSchema={validationDemoSchema}
+        onSubmit={(values) => {
+          console.log("Form submitted:", values);
+          alert("Form submitted successfully! Check console for details.");
+        }}
+      >
+        {({ values, errors, touched, handleChange, setFieldValue }) => (
+          <Form className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Basic validations */}
+              <div>
+                <InputField name="email" label="Email" type="email" />
+                <InputField name="phone" label="Phone Number" type="tel" />
+                <InputField name="website" label="Website" type="url" />
+                <InputField name="age" label="Age" type="number" />
+                <InputField name="birthDate" label="Birth Date" type="date" />
+              </div>
 
-//     const handleDrop = useCallback(async (
-//         e: React.DragEvent<HTMLLabelElement>,
-//         setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => void
-//     ) => {
-//         e.preventDefault();
-//         const f = e.dataTransfer.files?.[0];
-//         if (!f) return;
-//         await setFieldValue("file", f, true);
-//     }, []);
+              <div>
+                <InputField name="username" label="Username" type="text" />
 
-//     const handleFileChange = useCallback(async (
-//         e: React.ChangeEvent<HTMLInputElement>,
-//         setFieldValue: (field: string, value: unknown, shouldValidate?: boolean) => void
-//     ) => {
-//         const f = e.target.files?.[0];
-//         if (!f) return;
-//         await setFieldValue("file", f, true);
-//     }, []);
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2">Hobbies</label>
+                  <div className="space-y-2">
+                    {['Reading', 'Gaming', 'Sports', 'Music', 'Travel'].map(hobby => (
+                      <label key={hobby} className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          value={hobby}
+                          checked={values.hobbies.includes(hobby)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFieldValue('hobbies', [...values.hobbies, hobby]);
+                            } else {
+                              setFieldValue('hobbies', values.hobbies.filter(h => h !== hobby));
+                            }
+                          }}
+                          className="rounded border-gray-300"
+                        />
+                        <span className="text-sm">{hobby}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {touched.hobbies && errors.hobbies && (
+                    <div className="text-red-500 text-sm mt-1">{errors.hobbies}</div>
+                  )}
+                </div>
 
-//     const dropHandlers = useMemo(() => ({
-//         onDragOver: (e: React.DragEvent) => e.preventDefault(),
-//         onDragEnter: (e: React.DragEvent) => e.preventDefault(),
-//         onDragLeave: (e: React.DragEvent) => e.preventDefault(),
-//     }), []);
+                <div className="mb-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="hasCompany"
+                      checked={values.hasCompany}
+                      onChange={handleChange}
+                      className="rounded border-gray-300"
+                    />
+                    <span className="text-sm">I have a company</span>
+                  </label>
+                </div>
 
-//     const formatFileSize = (bytes: number): string => {
-//         if (bytes === 0) return '0 Bytes';
-//         const k = 1024;
-//         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-//         const i = Math.floor(Math.log(bytes) / Math.log(k));
-//         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-//     };
+                {values.hasCompany && (
+                  <InputField name="companyName" label="Company Name" type="text" />
+                )}
+              </div>
+            </div>
 
-//     return (
-//         <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-//             <div className="max-w-2xl mx-auto p-6">
-//                 <div className="flex justify-between items-center mb-4">
-//                     <h1 className="text-2xl font-semibold">Upload File</h1>
-//                     <div className="flex gap-2">
-//                         <button
-//                             type="button"
-//                             onClick={testApolloServer}
-//                             className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-//                         >
-//                             Test Server
-//                         </button>
-//                         <button
-//                             type="button"
-//                             onClick={testUploadMethods}
-//                             className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
-//                         >
-//                             Test Upload
-//                         </button>
-//                         <button
-//                             type="button"
-//                             onClick={testUploadFunction}
-//                             className="px-3 py-1 text-sm bg-purple-500 text-white rounded hover:bg-purple-600"
-//                         >
-//                             Test Simple
-//                         </button>
-//                     </div>
-//                 </div>
+            <div className="border p-4 rounded">
+              <h3 className="font-semibold mb-4">Address Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InputField name="address.street" label="Street" type="text" />
+                <InputField name="address.city" label="City" type="text" />
+                <InputField name="address.zipCode" label="ZIP Code" type="text" />
+                <InputField name="address.country" label="Country" type="text" />
+              </div>
+            </div>
 
+            <UploadField
+              name="documents"
+              label="Documents (PDF, DOC, Images)"
+              accept=".pdf,.doc,.docx,image/*"
+              multiple={true}
+              maxSize={10 * 1024 * 1024} // 10MB
+            />
+            {/* Button Submit */}
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            >
+              Submit Form
+            </button>
 
-//                 {banner && (
-//                     <BannerError type={banner?.type || "success"} msg={banner?.msg || ""} />
-//                 )}
-
-//                 <Formik<UploadFileValues>
-//                     initialValues={initialValues}
-//                     validateOnBlur
-//                     validateOnChange
-//                     validateOnMount
-//                     enableReinitialize={false}
-//                     validate={validate}
-//                     onSubmit={async (values, { setSubmitting, resetForm }) => {
-//                         if (!values.file) {
-//                             setBanner({ type: "error", msg: "Please select a file to upload" });
-//                             return;
-//                         }
-
-//                         setSubmitting(true);
-//                         setBanner(null);
-//                         setIsUploading(true);
-//                         setUploadProgress(0);
-
-//                         try {
-//                             // Upload to GraphQL API with real-time progress
-//                             const uploadResult = await uploadFileWithProgress(values.file, (progress) => {
-//                                 setUploadProgress(progress);
-//                             });
-
-//                             // Upload completed
-//                             setIsUploading(false);
-
-//                             setBanner({
-//                                 type: "success",
-//                                 msg: `File uploaded successfully! File ID: ${uploadResult.id}`
-//                             });
-
-//                             resetForm();
-//                             setUploadProgress(0);
-//                         } catch (error) {
-//                             setIsUploading(false);
-//                             setUploadProgress(0);
-//                             setBanner({
-//                                 type: "error",
-//                                 msg: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-//                             });
-//                         } finally {
-//                             setSubmitting(false);
-//                         }
-//                     }}
-//                 >
-//                     {({ values, errors, touched, isSubmitting, setFieldValue }) => (
-//                         <Form className="space-y-6">
-//                             {/* File Info Display */}
-//                             {values.file && (
-//                                 <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-//                                     <h3 className="text-sm font-medium mb-2">Selected File:</h3>
-//                                     <div className="flex items-center gap-3">
-//                                         <span className="text-2xl">{getFileIcon(values.file.name)}</span>
-//                                         <div className="flex-1">
-//                                             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-//                                                 {values.file.name}
-//                                             </p>
-//                                             <p className="text-xs text-gray-500 dark:text-gray-400">
-//                                                 {formatFileSize(values.file.size)} • {values.file.type || 'Unknown type'}
-//                                             </p>
-//                                         </div>
-//                                         <button
-//                                             type="button"
-//                                             onClick={() => setFieldValue("file", null)}
-//                                             className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-//                                         >
-//                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-//                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-//                                             </svg>
-//                                         </button>
-//                                     </div>
-//                                 </div>
-//                             )}
-
-//                             <label
-//                                 htmlFor="file-input"
-//                                 className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-700"
-//                                 onDrop={(e) => handleDrop(e, setFieldValue)}
-//                                 {...dropHandlers}
-//                             >
-//                                 <div className="flex flex-col items-center justify-center p-6 text-center">
-//                                     <div className="text-4xl mb-2">📁</div>
-//                                     <p className="mb-1 text-sm text-gray-600 dark:text-gray-300">
-//                                         <span className="font-medium">Click to select</span> or drag & drop
-//                                     </p>
-//                                     <p className="text-xs text-gray-500 dark:text-gray-400">
-//                                         {values.file ? `Selected: ${values.file.name}` : "Any file type, ≤ 10MB"}
-//                                     </p>
-//                                 </div>
-//                                 <input
-//                                     id="file-input"
-//                                     name="file"
-//                                     type="file"
-//                                     accept={ALLOWED_TYPES.join(",")}
-//                                     className="hidden"
-//                                     onChange={(e) => handleFileChange(e, setFieldValue)}
-//                                 />
-//                             </label>
-//                             {touched.file && errors.file && (
-//                                 <div className="text-xs text-red-600" role="alert">{errors.file as string}</div>
-//                             )}
-
-//                             {isUploading && (
-//                                 <div>
-//                                     <div className="w-full bg-gray-200 rounded-full h-3">
-//                                         <div
-//                                             className="bg-blue-500 h-3 rounded-full transition-all"
-//                                             style={{ width: `${Math.floor(uploadProgress)}%` }}
-//                                         />
-//                                     </div>
-//                                     <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-//                                         {Math.floor(uploadProgress)}%
-//                                     </div>
-//                                     <button
-//                                         type="button"
-//                                         className="mt-2 px-3 py-1.5 rounded-lg bg-red-500 text-white text-sm"
-//                                         onClick={stopUpload}
-//                                     >
-//                                         Cancel Upload
-//                                     </button>
-//                                 </div>
-//                             )}
-
-//                             <label className="inline-flex items-center gap-2 text-sm">
-//                                 <Field type="checkbox" name="acceptTerms" /> I accept the terms *
-//                             </label>
-//                             {touched.acceptTerms && (errors.acceptTerms as string) && (
-//                                 <div className="-mt-1 text-xs text-red-600" role="alert">{errors.acceptTerms as string}</div>
-//                             )}
-
-//                             <div className="flex items-center gap-3">
-//                                 <button
-//                                     type="submit"
-//                                     className="px-4 py-2 rounded-xl text-white bg-gray-900 dark:bg-gray-100 dark:text-gray-900 disabled:opacity-50"
-//                                     disabled={isSubmitting || isUploading}
-//                                 >
-//                                     {isSubmitting ? "Submitting…" : "Submit"}
-//                                 </button>
-//                             </div>
-//                         </Form>
-//                     )}
-//                 </Formik>
-//             </div>
-//         </div>
-//     );
-// };
+            {/* Debug */}
+            <details className="mt-6">
+              <summary className="cursor-pointer text-sm text-gray-600">Debug Info</summary>
+              <pre className="mt-2 p-4 bg-gray-100 rounded text-xs overflow-auto">
+                {JSON.stringify({ values, errors, touched }, null, 2)}
+              </pre>
+            </details>
+          </Form>
+        )}
+      </Formik>
+    </div>
+  );
+};

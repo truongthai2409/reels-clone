@@ -1,5 +1,4 @@
 import { STORAGE_KEY, todayISO } from "@/configs";
-import { ProfileSchema } from "@/helpers/validations/form.schema";
 import type { ProfileFormValues } from "@/types/form.types";
 
 const DEFAULT_VALUES: ProfileFormValues = {
@@ -13,7 +12,7 @@ const DEFAULT_VALUES: ProfileFormValues = {
   acceptTerms: false,
   experiences: [
     {
-      id: Date.now().toString(), // Add id for drag & drop
+      id: Date.now().toString(), // Thêm id
       company: "",
       role: "",
       startDate: todayISO(),
@@ -27,11 +26,14 @@ const DEFAULT_VALUES: ProfileFormValues = {
 export function loadDraft(): ProfileFormValues {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+    // console.log("Load draft:", raw);
     if (!raw) return DEFAULT_VALUES;
     const parsed = JSON.parse(raw);
-    // Use schema to coerce/clean any bad data from storage
-    const safe = ProfileSchema.catch(DEFAULT_VALUES).parse(parsed);
-    return safe;
+
+    return {
+      ...DEFAULT_VALUES,
+      ...parsed,
+    };
   } catch {
     return DEFAULT_VALUES;
   }

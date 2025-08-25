@@ -2,7 +2,7 @@ import React from 'react'
 
 interface BannerErrorProps {
     type: "success" | "error";
-    msg: string;
+    msg: string | React.ReactNode;
 }
 
 const BannerError: React.FC<BannerErrorProps> = ({ type, msg }) => {
@@ -18,5 +18,4 @@ const BannerError: React.FC<BannerErrorProps> = ({ type, msg }) => {
         </div>
     )
 }
-
 export default BannerError

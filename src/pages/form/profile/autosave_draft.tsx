@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import type { ProfileFormValues } from "@/types/form.types";
 import { STORAGE_KEY } from "@/configs";
 
@@ -7,18 +7,27 @@ export function AutosaveDraft({
   savingRef,
 }: {
   values: ProfileFormValues;
-  savingRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>;
+  savingRef: RefObject<ReturnType<typeof setTimeout> | null>;
 }) {
+  const firstRun = useRef(true);
+
   useEffect(() => {
+    if (firstRun.current) {
+      firstRun.current = false; // đánh dấu đã qua lần đầu
+      return; // thoát không chạy autosave
+    }
+
     if (savingRef.current) clearTimeout(savingRef.current);
+
     savingRef.current = setTimeout(() => {
       try {
+        console.log("Saving draft:", values);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
-      } catch {}
+      } catch { }
     }, 1000);
-    return () => {
-      if (savingRef.current) clearTimeout(savingRef.current);
-    };
   }, [values]);
+
+
   return null;
 }
+

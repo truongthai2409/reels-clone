@@ -11,7 +11,7 @@ import { BasicInfoSection, FormDebug, AutosaveDraft } from "./profile";
 
 interface BannerType {
   type: "success" | "error";
-  msg: string;
+  msg: string | React.ReactNode;
 }
 
 export default function ProfileForm() {
@@ -55,7 +55,7 @@ export default function ProfileForm() {
               const res = ProfileSchema.safeParse(values);
               if (res.success) return {};
               const formErrors: Record<string, string> = {};
-              res.error.issues.forEach((issue) => {
+              res.error.issues.forEach((issue: any) => {
                 const path = issue.path.join(".");
                 if (path) formErrors[path] = issue.message;
               });
@@ -78,8 +78,6 @@ export default function ProfileForm() {
 
               return (
                 <Form className="space-y-8">
-                  <AutosaveDraft values={values} savingRef={savingRef} />
-
                   {/* Basic Info */}
                   <BasicInfoSection values={values} aboutLen={aboutLen} aboutNearLimit={aboutNearLimit} setFieldValue={setFieldValue} />
 
@@ -91,6 +89,8 @@ export default function ProfileForm() {
 
                   {/* Debug */}
                   <FormDebug values={values} errors={errors} touched={touched} />
+
+                  <AutosaveDraft values={values} savingRef={savingRef} />
                 </Form>
               );
             }}
