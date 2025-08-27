@@ -8,6 +8,7 @@ import {
 } from '@/services/upload/upload_video.service';
 import { ProgressBar } from '@/components/upload';
 import { useBanner } from '@/hooks/useBanner';
+import { useUpload } from '@/hooks/useUpload';
 import { SubmitButton } from '@/components/upload/submit_button';
 import { SUPPORTED_VIDEO_TYPES } from '@/constraints';
 import { validateVideoFile } from '@/helpers/validations';
@@ -16,29 +17,45 @@ const initialValues: UploadImageValues = {
   file: null,
   acceptTerms: false,
 };
+ 
+interface VideoInfo {
+  duration: number;
+  width: number;
+  height: number;
+}
+
+interface ChunkProgress {
+  current: number;
+  total: number;
+}
 
 export const UploadVideo: React.FC = () => {
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [videoInfo, setVideoInfo] = useState<{
-    duration: number;
-    width: number;
-    height: number;
-  } | null>(null);
+  const [videoInfo, setVideoInfo] = useState<VideoInfo | null>(null);
   const [uploadMode, setUploadMode] = useState<'normal' | 'chunked'>('normal');
-  const [chunkProgress, setChunkProgress] = useState<{
-    current: number;
-    total: number;
-  } | null>(null);
+  const [chunkProgress, setChunkProgress] = useState<ChunkProgress | null>(null);
 
   const { setBanner, Banner } = useBanner();
+  const normalUpload = useUpload(uploadVideoWithProgress);
+  
+  const chunkedUpload = useUpload(async (file: File, onProgress: (p: number) => void) => {
+    return await uploadVideoInChunks(
+      file,
+      1024 * 1024, // 1MB chunks
+      onProgress,
+      (current, total) => setChunkProgress({ current, total })
+    );
+  });
 
-  const stopUpload = useCallback(() => {
-    setIsUploading(false);
-    setUploadProgress(0);
-    setChunkProgress(null);
-  }, []);
+  const currentUpload = uploadMode === 'normal' ? normalUpload : chunkedUpload;
+  const { 
+    uploadProgress, 
+    isUploading, 
+    error, 
+    uploadedResult, 
+    stopUpload, 
+    uploadFile,
+  } = currentUpload;
 
   const handleFileSelect = useCallback(
     async (
@@ -117,6 +134,31 @@ export const UploadVideo: React.FC = () => {
     };
   }, [previewUrl]);
 
+  useEffect(() => {
+    if (error) {
+      setBanner({ type: 'error', msg: `Upload failed: ${error}` });
+    }
+  }, [error, setBanner]);
+
+  useEffect(() => {
+    if (uploadedResult && !isUploading) {
+      setBanner({
+        type: 'success',
+        msg: (
+          <div>
+            <p>Video uploaded successfully!</p>
+            <p>File: {uploadedResult.originalName}</p>
+            {videoInfo && (
+              <p>
+                Resolution: {videoInfo.width}x{videoInfo.height}
+              </p>
+            )}
+          </div>
+        ),
+      });
+    }
+  }, [uploadedResult, isUploading, videoInfo, setBanner]);
+
   const handleSubmit = async (
     values: UploadImageValues,
     { setSubmitting, resetForm }: any
@@ -146,59 +188,37 @@ export const UploadVideo: React.FC = () => {
 
     setSubmitting(true);
     setBanner(null);
-    setIsUploading(true);
-    setUploadProgress(0);
     setChunkProgress(null);
 
     try {
-      let uploadResult;
-
-      if (uploadMode === 'chunked') {
-        uploadResult = await uploadVideoInChunks(
-          values.file,
-          1024 * 1024, // 1MB chunks
-          progress => setUploadProgress(progress),
-          (current, total) => setChunkProgress({ current, total })
-        );
-      } else {
-        uploadResult = await uploadVideoWithProgress(values.file, progress =>
-          setUploadProgress(progress)
-        );
-      }
-
-      setIsUploading(false);
-      setBanner({
-        type: 'success',
-        msg: (
-          <div>
-            <p>Video uploaded successfully!</p>
-            <p>File: {uploadResult.originalName}</p>
-            {videoInfo && (
-              <p>
-                Resolution: {videoInfo.width}x{videoInfo.height}
-              </p>
-            )}
-          </div>
-        ),
-      });
+      // Sử dụng uploadFile từ useUpload hook
+      await uploadFile(values.file);
 
       resetForm();
-      setUploadProgress(0);
       setPreviewUrl(null);
       setVideoInfo(null);
       setChunkProgress(null);
     } catch (error) {
-      setIsUploading(false);
-      setUploadProgress(0);
-      setChunkProgress(null);
-      setBanner({
-        type: 'error',
-        msg: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      });
+      // Error đã được xử lý trong useUpload hook
+      console.error('Upload error:', error);
     } finally {
       setSubmitting(false);
     }
   };
+
+  // Reset toàn bộ
+  const handleUploadModeChange = useCallback(() => {
+    const newMode = uploadMode === 'normal' ? 'chunked' : 'normal';
+    setUploadMode(newMode);
+    
+    normalUpload.resetUpload();
+    chunkedUpload.resetUpload();
+    
+    setPreviewUrl(null);
+    setVideoInfo(null);
+    setChunkProgress(null);
+    setBanner(null);
+  }, [uploadMode, normalUpload, chunkedUpload, setBanner]);
 
   return (
     <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
@@ -208,9 +228,7 @@ export const UploadVideo: React.FC = () => {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() =>
-                setUploadMode(uploadMode === 'normal' ? 'chunked' : 'normal')
-              }
+              onClick={handleUploadModeChange}
               className="px-4 py-2 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
               {uploadMode === 'normal'
@@ -232,16 +250,14 @@ export const UploadVideo: React.FC = () => {
           </p>
         </div>
 
-        {/* {banner && (<BannerError type={banner?.type || "success"} msg={banner?.msg || ""} />)} */}
         <Banner />
 
-        <Formik<UploadImageValues>
+        <Formik
           initialValues={initialValues}
           validateOnBlur
           validateOnChange
           validateOnMount
           enableReinitialize={false}
-          // validate={validateUpload}
           onSubmit={handleSubmit}
         >
           {({ values, errors, touched, setFieldValue }) => (
@@ -273,7 +289,7 @@ export const UploadVideo: React.FC = () => {
                       Duration: {Math.round(videoInfo.duration)}s | Resolution:{' '}
                       {videoInfo.width}×{videoInfo.height} | Size:{' '}
                       {values.file?.size
-                        ? (values.file.size / (1024 * 1024)).toFixed(2)
+                        ? (values.file.size / (1024 * 1024)).toFixed(2) // convert to MB
                         : '0.00'}
                       MB
                     </div>
